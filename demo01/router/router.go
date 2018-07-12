@@ -3,8 +3,8 @@ package router
 import (
 	"net/http"
 
-	"apiserver/handler/sd"
-	"apiserver/router/middleware"
+	"github.com/tongchao199/apiserver_demos/demo01/handler/sd"
+	"github.com/tongchao199/apiserver_demos/demo01/router/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +17,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	g.Use(middleware.Options)
 	g.Use(middleware.Secure)
 	g.Use(mw...)
+
 	// 404 Handler.
 	g.NoRoute(func(c *gin.Context) {
 		c.String(http.StatusNotFound, "The incorrect API route.")

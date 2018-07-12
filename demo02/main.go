@@ -2,27 +2,57 @@ package main
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"time"
 
-	"apiserver/config"
-	"apiserver/router"
+	"github.com/tongchao199/apiserver_demos/demo02/config"
+	"github.com/tongchao199/apiserver_demos/demo02/router"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+
+	log "github.com/sirupsen/logrus"
+	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
-var (
-	cfg = pflag.StringP("config", "c", "", "apiserver config file path.")
-)
+type Opts struct {
+	cfg     string
+	logFile string
+	logSize int32
+}
 
 func main() {
+	opts := &Opts{}
+
+	pflag.StringVarP(&opts.cfg, "config", "c", "", "apiserver config file path.")
+	pflag.StringVarP(&opts.logFile, "logFile", "f", "server.log", "apiserver log file.")
+	pflag.Int32VarP(&opts.logSize, "logSize", "s", 500, "apiserver log size.")
+
 	pflag.Parse()
 
+	if err := Serve(opts); err != nil {
+		log.Error(err)
+	}
+}
+
+func Serve(opts *Opts) error {
+	//Init logger
+	if opts.logFile != "" {
+		log.SetOutput(&lumberjack.Logger{
+			Filename:   opts.logFile,
+			MaxSize:    (int)(opts.logSize),
+			MaxBackups: 10,
+			MaxAge:     30,   // days
+			Compress:   true, // enable compress
+			LocalTime:  true, //
+		})
+	}
+
+	log.Infof("opts: %v", opts)
+
 	// init config
-	if err := config.Init(*cfg); err != nil {
+	if err := config.Init(opts.cfg); err != nil {
 		panic(err)
 	}
 
@@ -48,11 +78,13 @@ func main() {
 		if err := pingServer(); err != nil {
 			log.Fatal("The router has no response, or it might took too long to start up.", err)
 		}
-		log.Print("The router has been deployed successfully.")
+		log.Info("The router has been deployed successfully.")
 	}()
 
-	log.Printf("Start to listening the incoming requests on http address: %s", viper.GetString("addr"))
-	log.Printf(http.ListenAndServe(viper.GetString("addr"), g).Error())
+	log.Infof("Start to listening the incoming requests on http address: %s", viper.GetString("addr"))
+	log.Infof(http.ListenAndServe(viper.GetString("addr"), g).Error())
+
+	return nil
 }
 
 // pingServer pings the http server to make sure the router is working.

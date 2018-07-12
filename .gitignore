@@ -1,0 +1,52 @@
+# Compiled source #
+###################
+*.class
+*.dll
+*.exe
+*.o
+*.so
+.deps
+tags
+
+# Temporary files #
+###################
+*.swp
+*.swo
+*~
+
+# Packages #
+############
+*.7z
+*.dmg
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.rpm
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+*.out
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Grails
+######################
+target-eclipse
+
+# Dirs 
+######################
+.idea
+
+# Bin
+######################
+*_app

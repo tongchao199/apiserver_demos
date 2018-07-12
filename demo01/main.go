@@ -2,16 +2,51 @@ package main
 
 import (
 	"errors"
-	"log"
+	"flag"
 	"net/http"
 	"time"
 
-	"apiserver/router"
-
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
+	"github.com/tongchao199/apiserver_demos/demo01/router"
+	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
+type Opts struct {
+	listen  string
+	logFile string
+	logSize int
+}
+
 func main() {
+	opts := &Opts{}
+
+	flag.StringVar(&opts.listen, "listen", ":30000", "server listen port")
+	flag.StringVar(&opts.logFile, "logFile", "server.log", "log file path")
+	flag.IntVar(&opts.logSize, "logSize", 512, "log file size, the unit is MB(MegaByte)")
+
+	flag.Parse()
+
+	if err := Serve(opts); err != nil {
+		log.Error(err)
+	}
+}
+
+func Serve(opts *Opts) error {
+	//Init logger
+	if opts.logFile != "" {
+		log.SetOutput(&lumberjack.Logger{
+			Filename:   opts.logFile,
+			MaxSize:    opts.logSize,
+			MaxBackups: 10,
+			MaxAge:     30,   // days
+			Compress:   true, // enable compress
+			LocalTime:  true, //
+		})
+	}
+
+	log.Infof("opts: %v", opts)
+
 	// Create the Gin engine.
 	g := gin.New()
 
@@ -27,28 +62,30 @@ func main() {
 	)
 
 	// Ping the server to make sure the router is working.
-	go func() {
-		if err := pingServer(); err != nil {
+	go func(opts *Opts) {
+		if err := pingServer(opts); err != nil {
 			log.Fatal("The router has no response, or it might took too long to start up.", err)
 		}
-		log.Print("The router has been deployed successfully.")
-	}()
+		log.Infof("The router has been deployed successfully.")
+	}(opts)
 
-	log.Printf("Start to listening the incoming requests on http address: %s", ":8080")
-	log.Printf(http.ListenAndServe(":8080", g).Error())
+	log.Infof("Start to listening the incoming requests on http address: %s", ":8080")
+	log.Infof(http.ListenAndServe(opts.listen, g).Error())
+
+	return nil
 }
 
 // pingServer pings the http server to make sure the router is working.
-func pingServer() error {
+func pingServer(opts *Opts) error {
 	for i := 0; i < 2; i++ {
 		// Ping the server by sending a GET request to `/health`.
-		resp, err := http.Get("http://127.0.0.1:8080" + "/sd/health")
+		resp, err := http.Get("http://127.0.0.1" + opts.listen + "/sd/health")
 		if err == nil && resp.StatusCode == 200 {
 			return nil
 		}
 
 		// Sleep for a second to continue the next ping.
-		log.Print("Waiting for the router, retry in 1 second.")
+		log.Info("Waiting for the router, retry in 1 second.")
 		time.Sleep(time.Second)
 	}
 	return errors.New("Cannot connect to the router.")

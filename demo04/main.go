@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"apiserver/config"
-	"apiserver/model"
-	"apiserver/router"
+	"github.com/tongchao199/apiserver_demos/demo04/config"
+	"github.com/tongchao199/apiserver_demos/demo04/model"
+	"github.com/tongchao199/apiserver_demos/demo04/router"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -15,21 +15,30 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	cfg = pflag.StringP("config", "c", "", "apiserver config file path.")
-)
+type Opts struct {
+	cfg string
+}
 
 func main() {
+	opts := &Opts{}
+
+	pflag.StringVarP(&opts.cfg, "config", "c", "", "apiserver config file path.")
 	pflag.Parse()
 
-	// init config
-	if err := config.Init(*cfg); err != nil {
+	if err := Serve(opts); err != nil {
+		log.Error("failed to start server", err)
+	}
+}
+
+func Serve(opts *Opts) error {
+	// init config and logger
+	if err := config.Init(opts.cfg); err != nil {
 		panic(err)
 	}
 
-	// init db
-	model.DB.Init()
-	defer model.DB.Close()
+	// Init db
+	db := model.NewDatabase()
+	defer db.Close()
 
 	// Set gin mode.
 	gin.SetMode(viper.GetString("runmode"))
@@ -57,7 +66,9 @@ func main() {
 	}()
 
 	log.Infof("Start to listening the incoming requests on http address: %s", viper.GetString("addr"))
-	log.Info(http.ListenAndServe(viper.GetString("addr"), g).Error())
+	log.Infof(http.ListenAndServe(viper.GetString("addr"), g).Error())
+
+	return nil
 }
 
 // pingServer pings the http server to make sure the router is working.

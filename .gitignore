@@ -46,6 +46,7 @@ target-eclipse
 # Dirs 
 ######################
 .idea
+.vscode
 
 # Bin
 ######################

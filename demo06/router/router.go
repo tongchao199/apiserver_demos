@@ -3,9 +3,11 @@ package router
 import (
 	"net/http"
 
-	"apiserver/handler/sd"
-	"apiserver/handler/user"
-	"apiserver/router/middleware"
+	"github.com/tongchao199/apiserver_demos/demo06/router/middleware"
+
+	"github.com/tongchao199/apiserver_demos/demo06/handler/user"
+
+	"github.com/tongchao199/apiserver_demos/demo06/handler/sd"
 
 	"github.com/gin-gonic/gin"
 )

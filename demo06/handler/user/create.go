@@ -3,8 +3,9 @@ package user
 import (
 	"fmt"
 
-	. "apiserver/handler"
-	"apiserver/pkg/errno"
+	"github.com/tongchao199/apiserver_demos/demo06/pkg/errno"
+
+	. "github.com/tongchao199/apiserver_demos/demo06/handler"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lexkong/log"
@@ -35,6 +36,7 @@ func Create(c *gin.Context) {
 
 	if r.Password == "" {
 		SendResponse(c, fmt.Errorf("password is empty"), nil)
+		return
 	}
 
 	rsp := CreateResponse{

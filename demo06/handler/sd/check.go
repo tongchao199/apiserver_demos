@@ -73,7 +73,7 @@ func CPUCheck(c *gin.Context) {
 	c.String(status, "\n"+message)
 }
 
-// RAMCheck checks the disk usage.
+// RAMCheck checks the memory usage.
 func RAMCheck(c *gin.Context) {
 	u, _ := mem.VirtualMemory()
 

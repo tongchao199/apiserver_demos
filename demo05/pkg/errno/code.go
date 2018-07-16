@@ -7,5 +7,7 @@ var (
 	ErrBind             = &Errno{Code: 10002, Message: "Error occurred while binding the request body to the struct."}
 
 	// user errors
-	ErrUserNotFound = &Errno{Code: 20102, Message: "The user was not found."}
+	ErrUserNameEmpty = &Errno{Code: 20101, Message: "User name is empty."}
+	ErrPasswordEmpty = &Errno{Code: 20102, Message: "Password is empty."}
+	ErrUserNotFound  = &Errno{Code: 20103, Message: "The user was not found."}
 )

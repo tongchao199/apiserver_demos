@@ -1,6 +1,8 @@
 package errno
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Errno struct {
 	Code    int

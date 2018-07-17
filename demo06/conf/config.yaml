@@ -1,7 +1,7 @@
 runmode: debug               # 开发模式, debug, release, test
-addr: :30000                  # HTTP绑定端口
+addr: :8080                  # HTTP绑定端口
 name: apiserver              # API Server的名字
-url: http://127.0.0.1:30000   # pingServer函数请求的API服务器的ip:port
+url: http://localhost:8080   # pingServer函数请求的API服务器的ip:port
 max_ping_count: 10           # pingServer函数try的次数
 log:
   writers: file,stdout
@@ -14,6 +14,6 @@ log:
   log_backup_count: 7
 db:
   name: db_apiserver
-  addr: 172.29.16.13:3306
+  addr: localhost:3306
   username: root
   password: root
